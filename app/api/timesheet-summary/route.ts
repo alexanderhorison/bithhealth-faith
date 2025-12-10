@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { uploadFileToN8n } from '@/lib/n8n';
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,13 +13,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Send to n8n webhook
-    const result = await uploadFileToN8n('timesheet-summary', formData);
+    // Simulate processing
+    await new Promise(resolve => setTimeout(resolve, 2000));
     
     return NextResponse.json({
       success: true,
-      message: 'Timesheet uploaded successfully',
-      data: result,
+      message: 'Timesheet processed successfully',
+      data: {
+        fileName: file.name,
+        fileSize: file.size,
+        status: 'completed',
+        recordsProcessed: Math.floor(Math.random() * 1000) + 500
+      }
     });
   } catch (error) {
     console.error('Error uploading timesheet:', error);

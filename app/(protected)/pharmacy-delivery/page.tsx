@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -12,19 +10,50 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
-import { Upload, Cog, CheckCircle2 } from "lucide-react";
+import { FormCard } from "@/components/forms/form-card";
+import { ProcessButton } from "@/components/forms/process-button";
+import { WorkflowSteps } from "@/components/forms/workflow-steps";
+import { useFormSubmission } from "@/hooks/use-form-submission";
+import { PharmacyDeliveryService } from "@/lib/services";
 
 export default function PharmacyDeliveryPage() {
   const [file, setFile] = useState<File | null>(null);
   const [month, setMonth] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { toast } = useToast();
 
   const months = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
+    "Nov-2025", "Dec-2025", "Jan-2026", "Feb-2026", "Mar-2026", 
+    "Apr-2026", "May-2026", "June-2026", "July-2026", 
+    "August-2026", "September-2026", "October-2026", "November-2026", "December-2026",
   ];
+
+  const workflowSteps = [
+    {
+      title: "Upload Report Transaction",
+      description: "Current step - Upload delivery data",
+      status: "active" as const
+    },
+    {
+      title: "Process Unbilled Transaction", 
+      description: "Automated processing - Generate unbilled reports",
+      status: "automated" as const
+    },
+    {
+      title: "Process TIKI Delivery Order",
+      description: "Automated processing - Handle delivery orders", 
+      status: "automated" as const
+    }
+  ];
+
+  const { isSubmitting, isResetting, submitForm, resetForm } = useFormSubmission({
+    onSuccess: () => {
+      resetForm(() => {
+        setFile(null);
+        setMonth("");
+        const fileInput = document.getElementById('delivery-data') as HTMLInputElement;
+        if (fileInput) fileInput.value = '';
+      });
+    }
+  });
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -35,49 +64,20 @@ export default function PharmacyDeliveryPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!file) {
-      toast({
-        title: "Error",
-        description: "Please select a file",
-        variant: "destructive",
-      });
-      return;
-    }
+    await submitForm(async () => {
+      if (!file) {
+        throw new Error("Please select a delivery data file to continue");
+      }
 
-    if (!month) {
-      toast({
-        title: "Error",
-        description: "Please select a month",
-        variant: "destructive",
-      });
-      return;
-    }
+      if (!month) {
+        throw new Error("Please select a month for processing");
+      }
 
-    setIsSubmitting(true);
-
-    try {
-      // TODO: Implement the actual processing logic
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate processing
-      
-      toast({
-        title: "Success",
-        description: "Pharmacy delivery report is being processed",
+      return await PharmacyDeliveryService.submitDeliveryData({
+        data: file,
+        Month: month
       });
-
-      // Reset form
-      setFile(null);
-      setMonth("");
-      const fileInput = document.getElementById("file-input") as HTMLInputElement;
-      if (fileInput) fileInput.value = "";
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to process the report",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+    });
   };
 
   return (
@@ -92,114 +92,66 @@ export default function PharmacyDeliveryPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Upload Delivery Report</CardTitle>
-            <CardDescription>
-              Select the delivery data file and month for processing
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="file-input">
-                  data <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="file-input"
-                  type="file"
-                  onChange={handleFileChange}
-                  accept=".csv,.xlsx,.xls"
-                  className="cursor-pointer"
-                />
-                {file && (
-                  <p className="text-sm text-muted-foreground">
-                    Selected: {file.name}
-                  </p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="month">
-                  Month <span className="text-red-500">*</span>
-                </Label>
-                <Select value={month} onValueChange={setMonth}>
-                  <SelectTrigger id="month">
-                    <SelectValue placeholder="Select an option ..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {months.map((m) => (
-                      <SelectItem key={m} value={m}>
-                        {m}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <Button
-                type="submit"
-                className="w-full bg-[#FF6B6B] hover:bg-[#FF5252] text-white mb-0"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? "Processing..." : "Process"}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-
-        {/* Workflow Steps Card */}
-        <Card className="lg:col-span-1">
-          <CardHeader>
-            <CardTitle className="text-lg">Workflow Steps</CardTitle>
-            <CardDescription>
-              Automated pharmacy delivery reconciliation workflow for processing transactions, generating unbilled reports, and managing TIKI delivery orders
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {/* Step 1 */}
-              <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center">
-                  <CheckCircle2 className="h-5 w-5" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-sm">Upload Report Transaction</h3>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Current step - Upload delivery data
-                  </p>
-                </div>
-              </div>
-
-              {/* Step 2 */}
-              <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
-                  <Cog className="h-5 w-5 text-gray-500" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-sm text-gray-700">Process Unbilled Transaction</h3>
-                  <p className="text-sm text-gray-500 mt-1">
-                    Automated processing (parallel)
-                  </p>
-                </div>
-              </div>
-
-              {/* Step 3 */}
-              <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
-                  <Cog className="h-5 w-5 text-gray-500" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-sm text-gray-700">Process TIKI Delivery Order</h3>
-                  <p className="text-sm text-gray-500 mt-1">
-                    Automated processing (parallel)
-                  </p>
-                </div>
-              </div>
+      <div className="flex flex-col lg:flex-row gap-6">
+        <div className="flex-1">
+          <FormCard
+            title="Upload Delivery Report"
+            description="Select the delivery data file and month for processing"
+            isSubmitting={isSubmitting}
+            isResetting={isResetting}
+        >
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="delivery-data">
+                Pharmacy Delivery Report <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="delivery-data"
+                type="file"
+                onChange={handleFileChange}
+                accept=".csv,.xlsx,.xls"
+                className="cursor-pointer"
+              />
+              {file && (
+                <p className="text-sm text-muted-foreground">
+                  Selected: {file.name}
+                </p>
+              )}
             </div>
-          </CardContent>
-        </Card>
+
+            <div className="space-y-2">
+              <Label htmlFor="month">
+                Month <span className="text-red-500">*</span>
+              </Label>
+              <Select value={month} onValueChange={setMonth}>
+                <SelectTrigger id="month">
+                  <SelectValue placeholder="Select an option ..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {months.map((m) => (
+                    <SelectItem key={m} value={m}>
+                      {m}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <ProcessButton 
+              isSubmitting={isSubmitting} 
+              isResetting={isResetting}
+            />
+          </form>
+        </FormCard>
+        </div>
+        
+        <div className="lg:w-80 flex-shrink-0">
+          <WorkflowSteps
+            title="Processing Workflow"
+            description="Automated pharmacy delivery processing workflow that handles data validation, reconciliation, and report generation"
+            steps={workflowSteps}
+          />
+        </div>
       </div>
     </div>
   );
