@@ -10,14 +10,14 @@ import { useFormSubmission } from "@/hooks/use-form-submission";
 import { JiraService } from "@/lib/services";
 
 export default function JiraTimesheetGeneratorPage() {
-  const [timesheetPdf, setTimesheetPdf] = useState<File | null>(null);
-  const [spreadsheetLink, setSpreadsheetLink] = useState("");
+  const [driveLink, setDriveLink] = useState("");
+  const [spreadSheetName, setSpreadSheetName] = useState("");
   const [lastDate, setLastDate] = useState("");
 
   const workflowSteps = [
     {
       title: "Upload Timesheet & Data",
-      description: "Current step - Provide timesheet PDF and spreadsheet link",
+      description: "Current step - Provide Drive Link Contain Jira PDF",
       status: "active" as const
     },
     {
@@ -35,8 +35,8 @@ export default function JiraTimesheetGeneratorPage() {
   const { isSubmitting, isResetting, submitForm, resetForm } = useFormSubmission({
     onSuccess: () => {
       resetForm(() => {
-        setTimesheetPdf(null);
-        setSpreadsheetLink("");
+        setDriveLink("");
+        setSpreadSheetName("");
         setLastDate("");
         const fileInput = document.getElementById('timesheet-pdf') as HTMLInputElement;
         if (fileInput) fileInput.value = '';
@@ -44,22 +44,16 @@ export default function JiraTimesheetGeneratorPage() {
     }
   });
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setTimesheetPdf(e.target.files[0]);
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     await submitForm(async () => {
-      if (!timesheetPdf) {
+      if (!driveLink) {
         throw new Error("Please select a timesheet PDF file to continue");
       }
 
-      if (!spreadsheetLink) {
-        throw new Error("Please provide a spreadsheet link");
+      if (!spreadSheetName) {
+        throw new Error("Please provide a spreadsheet name");
       }
 
       if (!lastDate) {
@@ -67,8 +61,8 @@ export default function JiraTimesheetGeneratorPage() {
       }
 
       return await JiraService.generateTimesheetReport({
-        timesheetPdf,
-        spreadsheetLink,
+        driveLink,
+        spreadSheetName,
         lastDate
       });
     });
@@ -96,33 +90,28 @@ export default function JiraTimesheetGeneratorPage() {
         >
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="timesheet-pdf">
-                Timesheet PDF <span className="text-red-500">*</span>
+              <Label htmlFor="drive-link">
+                Drive Link <span className="text-red-500">*</span>
               </Label>
               <Input
-                id="timesheet-pdf"
-                type="file"
-                onChange={handleFileChange}
-                accept=".pdf"
-                className="cursor-pointer"
+                id="drive-link"
+                type="url"
+                value={driveLink}
+                onChange={(e) => setDriveLink(e.target.value)}
+                placeholder="https://drive.google.com/drive/folders/..."
               />
-              {timesheetPdf && (
-                <p className="text-sm text-muted-foreground">
-                  Selected: {timesheetPdf.name}
-                </p>
-              )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="spreadsheet-link">
-                Spreadsheet Link <span className="text-red-500">*</span>
+                Spreadsheet Name <span className="text-red-500">*</span>
               </Label>
               <Input
-                id="spreadsheet-link"
-                type="url"
-                value={spreadsheetLink}
-                onChange={(e) => setSpreadsheetLink(e.target.value)}
-                placeholder="https://docs.google.com/spreadsheets/..."
+                id="spreadsheet-name"
+                type="text"
+                value={spreadSheetName}
+                onChange={(e) => setSpreadSheetName(e.target.value)}
+                placeholder="1 - 30 Nov 2025"
               />
             </div>
 

@@ -1,113 +1,99 @@
 // Jira service for handling Jira timesheet operations
-import { ApiResponse } from './types'
+import { ApiResponse } from "./types";
 
 export interface JiraGeneratorData {
-  timesheetPdf: File
-  spreadsheetLink: string
-  lastDate: string
+  driveLink: string;
+  spreadSheetName: string;
+  lastDate: string;
 }
 
 export interface JiraUploadData {
-  file: File
+  files: File[];
+  spreadsheetLink: string;
+  lastDate: string;
 }
 
 export class JiraService {
-  private static readonly API_BASE_URL = 'https://n8n.zenithtech.cloud/webhook-test'
+  private static readonly API_BASE_URL =
+    "https://n8n-farhad.avocode.cloud/webhook";
 
-  static async generateTimesheetReport(data: JiraGeneratorData): Promise<ApiResponse> {
+  static async generateTimesheetReport(
+    data: JiraGeneratorData
+  ): Promise<ApiResponse> {
     try {
       // Simulate processing time for better UX demonstration
-      await new Promise(resolve => setTimeout(resolve, 2500))
-      
-      // For testing: always return success to demonstrate complete workflow
-      const mockResponse = {
-        status: 'success',
-        processedAt: new Date().toISOString(),
-        timesheetFile: data.timesheetPdf.name,
-        spreadsheetUrl: data.spreadsheetLink,
-        lastProcessedDate: data.lastDate,
-        reportGenerated: true,
-        issuesProcessed: Math.floor(Math.random() * 50) + 20,
-        totalHours: Math.floor(Math.random() * 100) + 80
-      }
+      await new Promise((resolve) => setTimeout(resolve, 2500));
 
-      return {
-        success: true,
-        message: `Jira timesheet report generated successfully! Processed ${mockResponse.issuesProcessed} issues with ${mockResponse.totalHours} total hours logged.`,
-        data: mockResponse
-      }
+      const formData = new FormData();
+      formData.append("Folder Link", data.driveLink);
+      formData.append("Generated Excel Timesheet Name", data.spreadSheetName);
+      formData.append("Last Date for timesheet calculation", data.lastDate);
 
-      /* Uncomment when ready to use real N8N webhook:
-      const formData = new FormData()
-      formData.append('timesheetPdf', data.timesheetPdf)
-      formData.append('spreadsheetLink', data.spreadsheetLink)
-      formData.append('lastDate', data.lastDate)
+      const response = await fetch(
+        `${this.API_BASE_URL}/5ee6ce9b-011d-435b-a7cb-d2a37793d417`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
-      const response = await fetch(`${this.API_BASE_URL}/jira-generator`, {
-        method: 'POST',
-        body: formData,
-      })
-
-      const result = await response.json()
+      const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.message || 'Failed to generate Jira report')
+        throw new Error(result.message || "Failed to generate Jira report");
       }
 
       return {
         success: true,
-        message: result.message || 'Jira report generated successfully',
-        data: result
-      }
-      */
+        message: result.message || "Jira report generated successfully",
+        data: result,
+      };
     } catch (error) {
-      throw new Error(error instanceof Error ? error.message : 'Failed to generate Jira timesheet report')
+      throw new Error(
+        error instanceof Error
+          ? error.message
+          : "Failed to generate Jira timesheet report"
+      );
     }
   }
 
   static async uploadTimesheet(data: JiraUploadData): Promise<ApiResponse> {
     try {
       // Simulate processing time
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      const mockResponse = {
-        status: 'success',
-        processedAt: new Date().toISOString(),
-        fileName: data.file.name,
-        uploadedToJira: true,
-        recordsUploaded: Math.floor(Math.random() * 200) + 100,
-        jiraTicketsUpdated: Math.floor(Math.random() * 25) + 15
-      }
+      await new Promise((resolve) => setTimeout(resolve, 2000));
 
-      return {
-        success: true,
-        message: `Successfully uploaded ${mockResponse.recordsUploaded} timesheet records to Jira. Updated ${mockResponse.jiraTicketsUpdated} tickets.`,
-        data: mockResponse
-      }
+      const formData = new FormData();
+      data.files.forEach((file) => {
+        formData.append("Timesheet Pdf", file);
+      });
+      formData.append("Spreadhseet Link", data.spreadsheetLink);
+      formData.append("Last Date for Calculation", data.lastDate);
 
-      /* Uncomment for real API:
-      const formData = new FormData()
-      formData.append('file', data.file)
+      const response = await fetch(
+        `${this.API_BASE_URL}/53a21877-81a0-481c-9d0e-b313e0dafcef`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
-      const response = await fetch(`${this.API_BASE_URL}/jira-upload`, {
-        method: 'POST',
-        body: formData,
-      })
-
-      const result = await response.json()
+      const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.message || 'Failed to upload to Jira')
+        throw new Error(result.message || "Failed to upload to Jira");
       }
 
       return {
         success: true,
-        message: result.message || 'Timesheet uploaded to Jira successfully',
-        data: result
-      }
-      */
+        message: result.message || "Timesheet uploaded to Jira successfully",
+        data: result,
+      };
     } catch (error) {
-      throw new Error(error instanceof Error ? error.message : 'Failed to upload timesheet to Jira')
+      throw new Error(
+        error instanceof Error
+          ? error.message
+          : "Failed to upload timesheet to Jira"
+      );
     }
   }
 }
