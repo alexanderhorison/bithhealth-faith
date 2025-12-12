@@ -14,8 +14,7 @@ export interface JiraUploadData {
 }
 
 export class JiraService {
-  private static readonly API_BASE_URL =
-    "https://n8n-farhad.avocode.cloud/webhook";
+  private static readonly API_N8N_URL = process.env.NEXT_PUBLIC_N8N_URL;
 
   static async generateTimesheetReport(
     data: JiraGeneratorData
@@ -30,7 +29,7 @@ export class JiraService {
       formData.append("Last Date for timesheet calculation", data.lastDate);
 
       const response = await fetch(
-        `${this.API_BASE_URL}/5ee6ce9b-011d-435b-a7cb-d2a37793d417`,
+        `${this.API_N8N_URL}/jira-timesheet/generate-report`,
         {
           method: "POST",
           body: formData,
@@ -70,7 +69,7 @@ export class JiraService {
       formData.append("Last Date for Calculation", data.lastDate);
 
       const response = await fetch(
-        `${this.API_BASE_URL}/53a21877-81a0-481c-9d0e-b313e0dafcef`,
+        `${this.API_N8N_URL}/jira-timesheet/bulk-upload`,
         {
           method: "POST",
           body: formData,
