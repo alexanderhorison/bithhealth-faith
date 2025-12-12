@@ -7,7 +7,7 @@ export interface PharmacyDeliveryData {
 }
 
 export class PharmacyDeliveryService {
-  private static readonly API_BASE_URL = 'https://n8n.zenithtech.cloud/webhook-test'
+  private static readonly API_BASE_URL = process.env.NEXT_PUBLIC_N8N_URL
 
   static async submitDeliveryData(data: PharmacyDeliveryData): Promise<ApiResponse> {
     const formData = new FormData()
@@ -18,24 +18,6 @@ export class PharmacyDeliveryService {
       // Simulate processing time for better UX demonstration
       await new Promise(resolve => setTimeout(resolve, 2000))
       
-      // For testing: always return success to demonstrate complete workflow
-      const mockResponse = {
-        status: 'success',
-        processedAt: new Date().toISOString(),
-        fileName: data.data.name,
-        month: data.Month,
-        transactionsProcessed: Math.floor(Math.random() * 500) + 100,
-        unbilledReportsGenerated: Math.floor(Math.random() * 50) + 10,
-        tikiOrdersProcessed: Math.floor(Math.random() * 30) + 5
-      }
-
-      return {
-        success: true,
-        message: `Successfully processed ${mockResponse.transactionsProcessed} transactions for ${data.Month}. Generated ${mockResponse.unbilledReportsGenerated} unbilled reports and ${mockResponse.tikiOrdersProcessed} TIKI delivery orders.`,
-        data: mockResponse
-      }
-
-      /* Uncomment when ready to use real N8N webhook:
       const response = await fetch(`${this.API_BASE_URL}/pharmacy-delivery/reconsile`, {
         method: 'POST',
         body: formData,
@@ -52,7 +34,7 @@ export class PharmacyDeliveryService {
         message: result.message || 'Workflow was started',
         data: result
       }
-      */
+      
     } catch (error) {
       throw new Error(error instanceof Error ? error.message : 'Failed to process delivery data')
     }

@@ -14,7 +14,7 @@ export interface JiraUploadData {
 }
 
 export class JiraService {
-  private static readonly API_N8N_URL = process.env.NEXT_PUBLIC_N8N_URL;
+  private static readonly API_BASE_URL = process.env.NEXT_PUBLIC_N8N_URL;
 
   static async generateTimesheetReport(
     data: JiraGeneratorData
@@ -29,7 +29,7 @@ export class JiraService {
       formData.append("Last Date for timesheet calculation", data.lastDate);
 
       const response = await fetch(
-        `${this.API_N8N_URL}/jira-timesheet/generate-report`,
+        `${this.API_BASE_URL}/jira-timesheet/generate-report`,
         {
           method: "POST",
           body: formData,
@@ -69,7 +69,7 @@ export class JiraService {
       formData.append("Last Date for Calculation", data.lastDate);
 
       const response = await fetch(
-        `${this.API_N8N_URL}/jira-timesheet/bulk-upload`,
+        `${this.API_BASE_URL}/jira-timesheet/bulk-upload`,
         {
           method: "POST",
           body: formData,

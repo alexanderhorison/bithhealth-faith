@@ -2,5 +2,5 @@
 export interface ApiResponse {
   success: boolean
   message: string
-  data?: any
+  data?: Record<string, unknown> // More specific than any
 }
