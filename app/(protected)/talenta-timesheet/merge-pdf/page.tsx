@@ -13,43 +13,44 @@ import { TimesheetService } from "@/lib/services";
 export default function MergePDFPage() {
   const [date, setDate] = useState("");
   const [sendTo, setSendTo] = useState("");
-  const [files, setFiles] = useState<FileList | null>(null);
+  const [currentStep, setCurrentStep] = useState(0);
 
-  const workflowSteps = [
+  const getWorkflowSteps = () => [
     {
-      title: "Select PDFs & Options",
-      description: "Current step - Choose files and merge settings",
-      status: "active" as const
+      title: "Process Timesheet",
+      description: currentStep === 0 ? "Current step - Upload and validate timesheet data" : "Upload and validate timesheet data",
+      status: currentStep > 0 ? "completed" as const : "active" as const
     },
     {
-      title: "Merge PDF Files",
-      description: "Automated processing - Combine selected PDFs",
-      status: "automated" as const
+      title: "Generate PDF",
+      description: "Automated processing - Generate individual PDFs",
+      status: currentStep > 1 ? "completed" as const : currentStep === 1 ? "processing" as const : "pending" as const
     },
     {
-      title: "Send Final Document",
-      description: "Automated processing - Deliver merged PDF",
-      status: "automated" as const
+      title: "Merge PDFs",
+      description: "Automated processing - Combine into consolidated document",
+      status: currentStep > 2 ? "completed" as const : currentStep === 2 ? "processing" as const : "pending" as const
     }
   ];
 
   const { isSubmitting, isResetting, submitForm, resetForm } = useFormSubmission({
     onSuccess: () => {
-      resetForm(() => {
-        setDate("");
-        setSendTo("");
-        setFiles(null);
-        const fileInput = document.getElementById('pdf-files') as HTMLInputElement;
-        if (fileInput) fileInput.value = '';
-      });
+      // Progress through workflow steps
+      setCurrentStep(1);
+      setTimeout(() => setCurrentStep(2), 1500);
+      setTimeout(() => {
+        setCurrentStep(3);
+        // Reset form after completion
+        setTimeout(() => {
+          resetForm(() => {
+            setDate("");
+            setSendTo("");
+            setCurrentStep(0);
+          });
+        }, 1500);
+      }, 3000);
     }
   });
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setFiles(e.target.files);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,11 +64,8 @@ export default function MergePDFPage() {
         throw new Error("Please select where to send the merged PDF");
       }
 
-      if (!files || files.length === 0) {
-        throw new Error("Please select PDF files to merge");
-      }
-
-      return await TimesheetService.mergePdfs({ files });
+      // Mock empty files for API compatibility
+      return await TimesheetService.mergePdfs({ date, sendTo });
     });
   };
 
@@ -93,25 +91,6 @@ export default function MergePDFPage() {
           >
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="pdf-files">
-                  Select PDF Files <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="pdf-files"
-                  type="file"
-                  multiple
-                  onChange={handleFileChange}
-                  accept=".pdf"
-                  className="cursor-pointer"
-                />
-                {files && files.length > 0 && (
-                  <p className="text-sm text-muted-foreground">
-                    Selected {files.length} file(s)
-                  </p>
-                )}
-              </div>
-
-              <div className="space-y-2">
                 <Label htmlFor="date">
                   Date <span className="text-red-500">*</span>
                 </Label>
@@ -133,10 +112,8 @@ export default function MergePDFPage() {
                     <SelectValue placeholder="Select destination..." />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="email">Email</SelectItem>
-                    <SelectItem value="sharepoint">SharePoint</SelectItem>
-                    <SelectItem value="download">Direct Download</SelectItem>
-                    <SelectItem value="cloud">Cloud Storage</SelectItem>
+                    <SelectItem value="Piere">Piere</SelectItem>
+                    <SelectItem value="Yos">Yos</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -151,9 +128,9 @@ export default function MergePDFPage() {
         
         <div className="lg:w-80 flex-shrink-0">
           <WorkflowSteps
-            title="Merge Process"
-            description="Automated PDF merging workflow that consolidates individual timesheet documents into a single comprehensive report"
-            steps={workflowSteps}
+            title="Processing Workflow"
+            description="Automated timesheet processing workflow that validates data, generates summaries, and creates comprehensive reports"
+            steps={getWorkflowSteps()}
           />
         </div>
       </div>

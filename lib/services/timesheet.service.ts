@@ -10,7 +10,8 @@ export interface TimesheetPdfData {
 }
 
 export interface TimesheetMergeData {
-  files: FileList
+  date: string
+  sendTo: string
 }
 
 export class TimesheetService {
@@ -80,9 +81,8 @@ export class TimesheetService {
       await new Promise(resolve => setTimeout(resolve, 3000))
       
       const formData = new FormData()
-      for (let i = 0; i < data.files.length; i++) {
-        formData.append('files', data.files[i])
-      }
+      formData.append('date', data.date)
+      formData.append('sendTo', data.sendTo)
 
       const response = await fetch(`${this.API_BASE_URL}/talenta-timesheet/merge-pdf`, {
         method: 'POST',

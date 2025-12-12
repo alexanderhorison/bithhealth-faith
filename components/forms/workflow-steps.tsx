@@ -1,10 +1,10 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { CheckCircle2, Cog } from "lucide-react"
+import { CheckCircle2, Cog, Loader2 } from "lucide-react"
 
 interface WorkflowStep {
   title: string
   description: string
-  status: 'active' | 'automated' | 'pending'
+  status: 'active' | 'automated' | 'pending' | 'completed' | 'processing'
 }
 
 interface WorkflowStepsProps {
@@ -31,10 +31,18 @@ export function WorkflowSteps({
               <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
                 step.status === 'active' 
                   ? 'bg-green-500 text-white'
+                  : step.status === 'completed'
+                  ? 'bg-green-500 text-white'
+                  : step.status === 'processing'
+                  ? 'bg-blue-500 text-white'
                   : 'bg-gray-200 text-gray-600'
               }`}>
                 {step.status === 'active' ? (
                   <CheckCircle2 className="h-5 w-5" />
+                ) : step.status === 'completed' ? (
+                  <CheckCircle2 className="h-5 w-5" />
+                ) : step.status === 'processing' ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
                 ) : (
                   <Cog className="h-5 w-5" />
                 )}

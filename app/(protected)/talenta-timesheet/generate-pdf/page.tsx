@@ -11,30 +11,41 @@ import { TimesheetService } from "@/lib/services";
 
 export default function GeneratePDFPage() {
   const [date, setDate] = useState("");
+  const [currentStep, setCurrentStep] = useState(0);
 
-  const workflowSteps = [
+  const getWorkflowSteps = () => [
     {
-      title: "Select Date",
-      description: "Current step - Choose date for PDF generation",
-      status: "active" as const
+      title: "Process Timesheet",
+      description: currentStep === 0 ? "Current step - Upload and validate timesheet data" : "Upload and validate timesheet data",
+      status: currentStep > 0 ? "completed" as const : "active" as const
     },
     {
-      title: "Generate Individual PDFs",
-      description: "Automated processing - Create individual timesheet PDFs",
-      status: "automated" as const
+      title: "Generate PDF",
+      description: "Automated processing - Generate individual PDFs",
+      status: currentStep > 1 ? "completed" as const : currentStep === 1 ? "processing" as const : "pending" as const
     },
     {
-      title: "Quality Validation",
-      description: "Automated processing - Validate PDF generation",
-      status: "automated" as const
+      title: "Merge PDFs",
+      description: "Automated processing - Combine into consolidated document",
+      status: currentStep > 2 ? "completed" as const : currentStep === 2 ? "processing" as const : "pending" as const
     }
   ];
 
   const { isSubmitting, isResetting, submitForm, resetForm } = useFormSubmission({
     onSuccess: () => {
-      resetForm(() => {
-        setDate("");
-      });
+      // Progress through workflow steps
+      setCurrentStep(1);
+      setTimeout(() => setCurrentStep(2), 1500);
+      setTimeout(() => {
+        setCurrentStep(3);
+        // Reset form after completion
+        setTimeout(() => {
+          resetForm(() => {
+            setDate("");
+            setCurrentStep(0);
+          });
+        }, 1500);
+      }, 3000);
     }
   });
 
@@ -97,9 +108,9 @@ export default function GeneratePDFPage() {
         
         <div className="lg:w-80 flex-shrink-0">
           <WorkflowSteps
-            title="PDF Generation Process"
-            description="Automated PDF generation workflow for mobility timesheets with individual document creation and validation"
-            steps={workflowSteps}
+            title="Processing Workflow"
+            description="Automated timesheet processing workflow that validates data, generates summaries, and creates comprehensive reports"
+            steps={getWorkflowSteps()}
           />
         </div>
       </div>
