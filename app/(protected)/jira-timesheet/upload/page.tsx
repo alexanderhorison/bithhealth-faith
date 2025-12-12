@@ -22,13 +22,13 @@ export default function JiraTimesheetUploadPage() {
       status: "active" as const,
     },
     {
-      title: "Process & Validate",
-      description: "Automated processing - Validate timesheet data",
+      title: "Process Jira Data",
+      description: "Automated processing - Extract and validate Jira entries",
       status: "automated" as const,
     },
     {
-      title: "Upload to Jira",
-      description: "Automated processing - Upload validated entries to Jira",
+      title: "Update Reports",
+      description: "Automated processing - Update employee reports",
       status: "automated" as const,
     },
   ];
@@ -86,19 +86,19 @@ export default function JiraTimesheetUploadPage() {
           Jira Timesheet Upload
         </h1>
         <p className="text-muted-foreground mt-2">
-          Upload timesheet data directly to Jira for automated time entry
-          processing.
+          Upload Employees Jira PDF timesheet for automated processing and update employee reports.
           <br />
-          Configure upload settings and validate entries before submission to
-          Jira tickets.
+          *This automation will change result on the provided spreadsheet link with value Valid or Invalid.
+          <br />
+          *PDF must have Start Date and End Date to calculate the timesheet period.
         </p>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6">
         <div className="flex-1">
           <FormCard
-            title="Upload Configuration"
-            description="Configure timesheet upload settings for Jira"
+            title="Jira Timesheet Upload"
+            description="Upload Jira PDF timesheet for updating employee reports."
             isSubmitting={isSubmitting}
             isResetting={isResetting}
           >
@@ -116,7 +116,7 @@ export default function JiraTimesheetUploadPage() {
                   onChange={handleFileChange}
                   className="cursor-pointer"
                 />
-                <p className="text-sm text-muted-foreground">Jira PDF Files Employee</p>
+                <p className="text-sm text-muted-foreground">Files Jira PDF of Employee</p>
                 {files.length > 0 && (
                   <ul className="text-sm text-muted-foreground mt-1">
                     {files.map((f, idx) => (
@@ -168,7 +168,7 @@ export default function JiraTimesheetUploadPage() {
         <div className="lg:w-80 flex-shrink-0">
           <WorkflowSteps
             title="Upload Process"
-            description="Automated Jira timesheet upload workflow that validates data, processes entries, and updates Jira tickets with time tracking information"
+            description="Automated Jira timesheet report generation workflow that processes PDF data, validates employees task, and update employee reports."
             steps={workflowSteps}
           />
         </div>

@@ -75,8 +75,9 @@ export default function JiraTimesheetGeneratorPage() {
           Jira Timesheet Report Generator
         </h1>
         <p className="text-muted-foreground mt-2">
-          Generate comprehensive Jira timesheet reports by combining PDF timesheets with spreadsheet data.
-          <br />Process and validate time entries logged in Jira against project requirements.
+          Generate comprehensive Jira timesheet reports by Google Drive URL with provided PDF Jira Timesheet Employee.
+          <br />
+          *PDF must have Start Date and End Date to calculate the timesheet period.
         </p>
       </div>
 
@@ -141,7 +142,7 @@ export default function JiraTimesheetGeneratorPage() {
         <div className="lg:w-80 flex-shrink-0">
           <WorkflowSteps
             title="Report Generation"
-            description="Automated Jira timesheet report generation workflow that processes PDF data, validates spreadsheet entries, and creates comprehensive reports"
+            description="Automated Jira timesheet report generation workflow that processes PDF data, validates employees task, and creates comprehensive reports"
             steps={workflowSteps}
           />
         </div>
