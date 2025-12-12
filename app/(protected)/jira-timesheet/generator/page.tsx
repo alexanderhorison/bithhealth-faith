@@ -100,6 +100,7 @@ export default function JiraTimesheetGeneratorPage() {
                 onChange={(e) => setDriveLink(e.target.value)}
                 placeholder="https://drive.google.com/drive/folders/..."
               />
+              <p className="text-sm text-muted-foreground">Google Drive link stores All PDF jira employee</p>
             </div>
 
             <div className="space-y-2">
@@ -113,6 +114,7 @@ export default function JiraTimesheetGeneratorPage() {
                 onChange={(e) => setSpreadSheetName(e.target.value)}
                 placeholder="1 - 30 Nov 2025"
               />
+              <p className="text-sm text-muted-foreground">Spreadsheet name to store the final processed Jira timesheet report</p>
             </div>
 
             <div className="space-y-2">
@@ -125,6 +127,7 @@ export default function JiraTimesheetGeneratorPage() {
                 value={lastDate}
                 onChange={(e) => setLastDate(e.target.value)}
               />
+              <p className="text-sm text-muted-foreground">Calculation Date mid (15) or end (30/31) of the month</p>
             </div>
 
             <ProcessButton 

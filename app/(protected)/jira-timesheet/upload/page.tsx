@@ -17,7 +17,8 @@ export default function JiraTimesheetUploadPage() {
   const workflowSteps = [
     {
       title: "Upload Timesheet File",
-      description: "Current step - Provide timesheet PDF and configure upload settings",
+      description:
+        "Current step - Provide timesheet PDF and configure upload settings",
       status: "active" as const,
     },
     {
@@ -115,7 +116,7 @@ export default function JiraTimesheetUploadPage() {
                   onChange={handleFileChange}
                   className="cursor-pointer"
                 />
-
+                <p className="text-sm text-muted-foreground">Jira PDF Files Employee</p>
                 {files.length > 0 && (
                   <ul className="text-sm text-muted-foreground mt-1">
                     {files.map((f, idx) => (
@@ -137,6 +138,7 @@ export default function JiraTimesheetUploadPage() {
                   onChange={(e) => setSpreadsheetLink(e.target.value)}
                   placeholder="https://docs.google.com/spreadsheets/d/.."
                 />
+                <p className="text-sm text-muted-foreground">Existing Spreadsheet link to stores the changes result</p>
               </div>
 
               {/* Date */}
@@ -150,6 +152,9 @@ export default function JiraTimesheetUploadPage() {
                   value={lastDate}
                   onChange={(e) => setLastDate(e.target.value)}
                 />
+                <p className="text-sm text-muted-foreground">
+                  Calculation Date mid (15) or end (30/31) of the month
+                </p>
               </div>
 
               <ProcessButton
