@@ -18,15 +18,15 @@ export default async function DashboardPage() {
       title: "Jira Timesheets Checker",
       description: "Validate and verify time entries logged in Jira against project requirements",
       icon: CheckSquare,
-      href: "#",
-      status: "Coming Soon",
+      href: "/jira-timesheet/generator",
+      status: "Active",
     },
     {
       title: "Auto Reconcile Pharmacy Delivery",
       description: "Automated reconciliation of pharmacy deliveries with invoice generation",
       icon: Package,
-      href: "#",
-      status: "Coming Soon",
+      href: "/pharmacy-delivery",
+      status: "Active",
     },
   ];
 
