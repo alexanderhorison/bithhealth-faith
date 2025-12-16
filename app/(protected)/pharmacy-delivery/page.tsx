@@ -19,6 +19,7 @@ import { PharmacyDeliveryService } from "@/lib/services";
 export default function PharmacyDeliveryPage() {
   const [file, setFile] = useState<File | null>(null);
   const [month, setMonth] = useState("");
+  const [summaryMonth, setSummaryMonth] = useState("");
 
   const months = [
     "Nov-2025", "Dec-2025", "Jan-2026", "Feb-2026", "Mar-2026", 
@@ -55,6 +56,19 @@ export default function PharmacyDeliveryPage() {
     }
   });
 
+  const { 
+    isSubmitting: isSummarySubmitting, 
+    isResetting: isSummaryResetting, 
+    submitForm: submitSummaryForm, 
+    resetForm: resetSummaryForm 
+  } = useFormSubmission({
+    onSuccess: () => {
+      resetSummaryForm(() => {
+        setSummaryMonth("");
+      });
+    }
+  });
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setFile(e.target.files[0]);
@@ -80,6 +94,18 @@ export default function PharmacyDeliveryPage() {
     });
   };
 
+  const handleSummarySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    await submitSummaryForm(async () => {
+      if (!summaryMonth) {
+        throw new Error("Please select a month for summary report generation");
+      }
+
+      return await PharmacyDeliveryService.generateSummaryReport(summaryMonth);
+    });
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -94,55 +120,92 @@ export default function PharmacyDeliveryPage() {
 
       <div className="flex flex-col lg:flex-row gap-6">
         <div className="flex-1">
-          <FormCard
-            title="Upload Delivery Report"
-            description="Select the delivery data file and month for processing"
-            isSubmitting={isSubmitting}
-            isResetting={isResetting}
-        >
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="delivery-data">
-                Pharmacy Delivery Report <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="delivery-data"
-                type="file"
-                onChange={handleFileChange}
-                accept=".csv,.xlsx,.xls"
-                className="cursor-pointer"
-              />
-              {file && (
-                <p className="text-sm text-muted-foreground">
-                  Selected: {file.name}
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="month">
-                Month <span className="text-red-500">*</span>
-              </Label>
-              <Select value={month} onValueChange={setMonth}>
-                <SelectTrigger id="month">
-                  <SelectValue placeholder="Select an option ..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {months.map((m) => (
-                    <SelectItem key={m} value={m}>
-                      {m}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <ProcessButton 
-              isSubmitting={isSubmitting} 
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <FormCard
+              title="Upload Delivery Report"
+              description="Select the delivery data file and month for processing"
+              isSubmitting={isSubmitting}
               isResetting={isResetting}
-            />
-          </form>
-        </FormCard>
+            >
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="delivery-data">
+                    Pharmacy Delivery Report <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="delivery-data"
+                    type="file"
+                    onChange={handleFileChange}
+                    accept=".csv,.xlsx,.xls"
+                    className="cursor-pointer"
+                  />
+                  {file && (
+                    <p className="text-sm text-muted-foreground">
+                      Selected: {file.name}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="month">
+                    Month <span className="text-red-500">*</span>
+                  </Label>
+                  <Select value={month} onValueChange={setMonth}>
+                    <SelectTrigger id="month">
+                      <SelectValue placeholder="Select an option ..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {months.map((m) => (
+                        <SelectItem key={m} value={m}>
+                          {m}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <ProcessButton 
+                  isSubmitting={isSubmitting} 
+                  isResetting={isResetting}
+                />
+              </form>
+            </FormCard>
+
+            <div className="self-start">
+              <FormCard
+                title="Generate Summary Report"
+                description="Generate a comprehensive summary report for the selected month"
+                isSubmitting={isSummarySubmitting}
+                isResetting={isSummaryResetting}
+              >
+                <form onSubmit={handleSummarySubmit} className="space-y-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="summary-month">
+                      Month <span className="text-red-500">*</span>
+                    </Label>
+                    <Select value={summaryMonth} onValueChange={setSummaryMonth}>
+                      <SelectTrigger id="summary-month">
+                        <SelectValue placeholder="Select an option ..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {months.map((m) => (
+                          <SelectItem key={m} value={m}>
+                            {m}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <ProcessButton 
+                    isSubmitting={isSummarySubmitting} 
+                    isResetting={isSummaryResetting}
+                    text="Generate Summary Report"
+                  />
+                </form>
+              </FormCard>
+            </div>
+          </div>
         </div>
         
         <div className="lg:w-80 flex-shrink-0">

@@ -39,4 +39,46 @@ export class PharmacyDeliveryService {
       throw new Error(error instanceof Error ? error.message : 'Failed to process delivery data')
     }
   }
+
+  static async generateSummaryReport(month: string): Promise<ApiResponse> {
+    try {
+      if (!this.API_BASE_URL) {
+        throw new Error('API base URL not configured')
+      }
+
+      // Simulate processing time for better UX demonstration
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      
+      const url = `${this.API_BASE_URL}/pharmacy-delivery/generate-summary-report?month=${month}`
+      console.log('Making request to:', url)
+      
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        }
+      })
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`)
+      }
+
+      const result = await response.json()
+
+      return {
+        success: true,
+        message: result.message || 'Summary report generated successfully',
+        data: result
+      }
+      
+    } catch (error) {
+      console.error('Summary report generation error:', error)
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        throw new Error('Network error: Unable to connect to the API. Please check your internet connection.')
+      }
+      throw new Error(error instanceof Error ? error.message : 'Failed to generate summary report')
+    }
+  }
 }
