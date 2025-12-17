@@ -118,65 +118,67 @@ export default function PharmacyDeliveryPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <FormCard
-          title="Upload Delivery Report"
-          description="Select the delivery data file and month for processing"
-          isSubmitting={isSubmitting}
-          isResetting={isResetting}
-        >
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="delivery-data">
-                Pharmacy Delivery Report <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="delivery-data"
-                type="file"
-                onChange={handleFileChange}
-                accept=".csv,.xlsx,.xls"
-                className="cursor-pointer"
-              />
-              {file && (
-                <p className="text-sm text-muted-foreground">
-                  Selected: {file.name}
-                </p>
-              )}
-            </div>
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:items-stretch">
+          <FormCard
+            title="Upload Delivery Report"
+            description="Select the delivery data file and month for processing"
+            isSubmitting={isSubmitting}
+            isResetting={isResetting}
+          >
+            <form onSubmit={handleSubmit} className="flex flex-col h-full space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="delivery-data">
+                  Pharmacy Delivery Report <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="delivery-data"
+                  type="file"
+                  onChange={handleFileChange}
+                  accept=".csv,.xlsx,.xls"
+                  className="cursor-pointer"
+                />
+                {file && (
+                  <p className="text-sm text-muted-foreground">
+                    Selected: {file.name}
+                  </p>
+                )}
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="month">
-                Month <span className="text-red-500">*</span>
-              </Label>
-              <Select value={month} onValueChange={setMonth}>
-                <SelectTrigger id="month">
-                  <SelectValue placeholder="Select an option ..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {months.map((m) => (
-                    <SelectItem key={m} value={m}>
-                      {m}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+              <div className="space-y-2">
+                <Label htmlFor="month">
+                  Month <span className="text-red-500">*</span>
+                </Label>
+                <Select value={month} onValueChange={setMonth}>
+                  <SelectTrigger id="month">
+                    <SelectValue placeholder="Select an option ..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {months.map((m) => (
+                      <SelectItem key={m} value={m}>
+                        {m}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-            <ProcessButton 
-              isSubmitting={isSubmitting} 
-              isResetting={isResetting}
-            />
-          </form>
-        </FormCard>
+              <div className="mt-auto">
+                <ProcessButton 
+                  isSubmitting={isSubmitting} 
+                  isResetting={isResetting}
+                />
+              </div>
+            </form>
+          </FormCard>
 
-        <div className="self-start">
           <FormCard
             title="Generate Summary Report"
             description="Generate a comprehensive summary report for the selected month"
             isSubmitting={isSummarySubmitting}
             isResetting={isSummaryResetting}
           >
-            <form onSubmit={handleSummarySubmit} className="space-y-6">
+            <form onSubmit={handleSummarySubmit} className="flex flex-col h-full space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="summary-month">
                   Month <span className="text-red-500">*</span>
@@ -195,11 +197,13 @@ export default function PharmacyDeliveryPage() {
                 </Select>
               </div>
 
-              <ProcessButton 
-                isSubmitting={isSummarySubmitting} 
-                isResetting={isSummaryResetting}
-                text="Generate Summary Report"
-              />
+              <div className="mt-auto">
+                <ProcessButton 
+                  isSubmitting={isSummarySubmitting} 
+                  isResetting={isSummaryResetting}
+                  text="Generate Summary Report"
+                />
+              </div>
             </form>
           </FormCard>
         </div>
