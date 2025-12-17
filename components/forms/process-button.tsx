@@ -4,6 +4,7 @@ interface ProcessButtonProps {
   isSubmitting?: boolean
   isResetting?: boolean
   children?: React.ReactNode
+  text?: string
   className?: string
   onClick?: () => void
   type?: "button" | "submit" | "reset"
@@ -13,10 +14,13 @@ export function ProcessButton({
   isSubmitting = false, 
   isResetting = false,
   children = "Process",
+  text,
   className = "",
   onClick,
   type = "submit"
 }: ProcessButtonProps) {
+  const buttonText = text || children
+  
   return (
     <Button
       type={type}
@@ -24,7 +28,7 @@ export function ProcessButton({
       disabled={isSubmitting || isResetting}
       onClick={onClick}
     >
-      {children}
+      {buttonText}
     </Button>
   )
 }

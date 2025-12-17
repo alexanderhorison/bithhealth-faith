@@ -3,11 +3,13 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.pnpm-debug.log*
 
 # Next.js
 .next/
 out/
 build/
+dist/
 
 # Environment variables
 .env
@@ -16,15 +18,37 @@ build/
 
 # Testing
 coverage/
+.nyc_output/
 
 # Misc
 .DS_Store
 *.pem
+Thumbs.db
 
 # Debug
 *.log
 .vscode/
 .idea/
+*.swp
+*.swo
 
 # Vercel
 .vercel
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Git
+.git
+.gitignore
+
+# Documentation
+README.md
+*.md
+
+# Config files
+eslint.config.mjs
+.eslintrc*
+.prettierrc*

@@ -10,15 +10,26 @@ services:
         - NEXT_PUBLIC_CLERK_SIGN_UP_URL=${NEXT_PUBLIC_CLERK_SIGN_UP_URL}
         - NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=${NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL}
         - NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=${NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL}
-    container_name: admin-app
+        - NEXT_PUBLIC_N8N_URL=${NEXT_PUBLIC_N8N_URL}
+    container_name: faith-admin-app
     ports:
-      - "3000:3000"
+      - "${PORT:-8899}:${PORT:-8899}"
+    environment:
+      - NODE_ENV=production
+      - PORT=${PORT:-8899}
+      - HOSTNAME=0.0.0.0
     env_file:
-      - .env.local
+      - .env
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:${PORT:-8899}/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     networks:
-      - admin-network
+      - tunnel
 
 networks:
-  admin-network:
-    driver: bridge
+  tunnel:
+    external: true
