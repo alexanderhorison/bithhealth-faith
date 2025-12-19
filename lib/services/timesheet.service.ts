@@ -3,6 +3,7 @@ import { ApiResponse } from './types'
 
 export interface TimesheetData {
   file: File
+  file_name: string
 }
 
 export interface TimesheetPdfData {
@@ -24,6 +25,7 @@ export class TimesheetService {
       
       const formData = new FormData()
       formData.append('file', data.file)
+      formData.append('file_name', data.file_name)
 
       const response = await fetch(`${this.API_BASE_URL}/talenta-timesheet/summarize`, {
         method: 'POST',

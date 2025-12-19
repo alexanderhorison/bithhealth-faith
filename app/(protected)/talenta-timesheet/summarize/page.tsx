@@ -10,6 +10,7 @@ import { useFormSubmission } from "@/hooks/use-form-submission";
 import { TimesheetService } from "@/lib/services";
 
 export default function TimesheetSummarizePage() {
+  const [fileName, setFileName] = useState(""); // file_name will be the selected date
   const [file, setFile] = useState<File | null>(null);
 
   const workflowSteps = [
@@ -33,6 +34,7 @@ export default function TimesheetSummarizePage() {
   const { isSubmitting, isResetting, submitForm, resetForm } = useFormSubmission({
     onSuccess: () => {
       resetForm(() => {
+        setFileName("");
         setFile(null);
         const fileInput = document.getElementById('timesheet-file') as HTMLInputElement;
         if (fileInput) fileInput.value = '';
@@ -50,11 +52,15 @@ export default function TimesheetSummarizePage() {
     e.preventDefault();
 
     await submitForm(async () => {
+      if (!fileName.trim()) {
+        throw new Error("Please select a date");
+      }
+      
       if (!file) {
         throw new Error("Please select a timesheet file to continue");
       }
 
-      return await TimesheetService.summarizeTimesheet({ file });
+      return await TimesheetService.summarizeTimesheet({ file, file_name: fileName });
     });
   };
 
@@ -80,8 +86,21 @@ export default function TimesheetSummarizePage() {
           >
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
+                <Label htmlFor="file-name">
+                  Enter Date<span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="file-name"
+                  type="date"
+                  value={fileName}
+                  onChange={(e) => setFileName(e.target.value)}
+                  className="cursor-pointer"
+                />
+              </div>
+
+              <div className="space-y-2">
                 <Label htmlFor="timesheet-file">
-                  Upload Timesheet <span className="text-red-500">*</span>
+                  Upload Timesheet<span className="text-red-500">*</span>
                 </Label>
                 <Input
                   id="timesheet-file"
