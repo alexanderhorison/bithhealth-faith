@@ -25,7 +25,7 @@ export class TimesheetService {
       const formData = new FormData()
       formData.append('file', data.file)
 
-      const response = await fetch(`${this.API_BASE_URL}/talenta-timesheet/summarize`, {
+      const response = await fetch(`${this.API_BASE_URL}/v2/talenta-timesheet/summarize`, {
         method: 'POST',
         body: formData,
       })

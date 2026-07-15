@@ -1,5 +1,5 @@
 services:
-  admin-app:
+  faith:
     build:
       context: .
       dockerfile: Dockerfile
@@ -11,7 +11,7 @@ services:
         - NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=${NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL}
         - NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=${NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL}
         - NEXT_PUBLIC_N8N_URL=${NEXT_PUBLIC_N8N_URL}
-    container_name: faith-admin-app
+    container_name: admin
     ports:
       - "${PORT:-8899}:${PORT:-8899}"
     environment:
