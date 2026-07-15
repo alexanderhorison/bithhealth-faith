@@ -1,62 +1,53 @@
-"use client";
+'use client'
 
-import { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { FormCard } from "@/components/forms/form-card";
-import { ProcessButton } from "@/components/forms/process-button";
-import { WorkflowSteps } from "@/components/forms/workflow-steps";
-import { useFormSubmission } from "@/hooks/use-form-submission";
-import { TimesheetService } from "@/lib/services";
+import { FormCard } from '@/components/forms/form-card'
+import { ProcessButton } from '@/components/forms/process-button'
+import { WorkflowSteps } from '@/components/forms/workflow-steps'
+import { useFileUpload } from '@/hooks/use-file-upload'
+import { useFormSubmission } from '@/hooks/use-form-submission'
+import { TimesheetService } from '@/lib/services'
+import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
+
+const WORKFLOW_STEPS = [
+  {
+    title: 'Process Timesheet',
+    description: 'Current step - Upload and validate timesheet data',
+    status: 'active' as const,
+  },
+  {
+    title: 'Generate PDF',
+    description: 'Automated processing - Generate individual PDFs',
+    status: 'automated' as const,
+  },
+  {
+    title: 'Merge PDFs',
+    description:
+      'Automated processing - Combine into consolidated document',
+    status: 'automated' as const,
+  },
+]
 
 export default function TimesheetSummarizePage() {
-  const [file, setFile] = useState<File | null>(null);
-
-  const workflowSteps = [
-    {
-      title: "Process Timesheet",
-      description: "Current step - Upload and validate timesheet data",
-      status: "active" as const
-    },
-    {
-      title: "Generate PDF",
-      description: "Automated processing - Generate individual PDFs",
-      status: "automated" as const
-    },
-    {
-      title: "Merge PDFs",
-      description: "Automated processing - Combine into consolidated document",
-      status: "automated" as const
-    }
-  ];
-
-  const { isSubmitting, isResetting, submitForm, resetForm } = useFormSubmission({
-    onSuccess: () => {
-      resetForm(() => {
-        setFile(null);
-        const fileInput = document.getElementById('timesheet-file') as HTMLInputElement;
-        if (fileInput) fileInput.value = '';
-      });
-    }
-  });
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
-    }
-  };
+  const { file, handleFileChange, clearFile } = useFileUpload()
+  const { isSubmitting, isResetting, submitForm, resetForm, formRef } =
+    useFormSubmission({
+      onSuccess: async () => {
+        await resetForm(() => clearFile('timesheet-file'))
+      },
+    })
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
 
     await submitForm(async () => {
       if (!file) {
-        throw new Error("Please select a timesheet file to continue");
+        throw new Error('Please select a timesheet file to continue')
       }
 
-      return await TimesheetService.summarizeTimesheet({ file });
-    });
-  };
+      return await TimesheetService.summarizeTimesheet({ file })
+    })
+  }
 
   return (
     <div className="space-y-6">
@@ -65,8 +56,11 @@ export default function TimesheetSummarizePage() {
           Summarize Timesheet
         </h1>
         <p className="text-muted-foreground mt-2">
-          Timesheet Summarize is an intelligent orchestration engine designed to fully automate
-          <br />the process of employee work hour validation, calculation, and reporting.
+          Timesheet Summarize is an intelligent orchestration engine designed to
+          fully automate
+          <br />
+          the process of employee work hour validation, calculation, and
+          reporting.
         </p>
       </div>
 
@@ -78,7 +72,7 @@ export default function TimesheetSummarizePage() {
             isSubmitting={isSubmitting}
             isResetting={isResetting}
           >
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="timesheet-file">
                   Upload Timesheet <span className="text-red-500">*</span>
@@ -97,22 +91,21 @@ export default function TimesheetSummarizePage() {
                 )}
               </div>
 
-              <ProcessButton 
-                isSubmitting={isSubmitting} 
-                isResetting={isResetting}
-              />
+              <ProcessButton isSubmitting={isSubmitting} isResetting={isResetting}>
+                Process
+              </ProcessButton>
             </form>
           </FormCard>
         </div>
-        
+
         <div className="lg:w-80 flex-shrink-0">
           <WorkflowSteps
             title="Processing Workflow"
             description="Automated timesheet processing workflow that validates data, generates summaries, and creates comprehensive reports"
-            steps={workflowSteps}
+            steps={WORKFLOW_STEPS}
           />
         </div>
       </div>
     </div>
-  );
+  )
 }

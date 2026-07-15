@@ -1,108 +1,42 @@
 // Timesheet service for handling Talenta timesheet operations
-import { ApiResponse } from './types'
+import { BaseService } from './base.service'
+import {
+  ApiResponse,
+  TimesheetData,
+  GeneratePdfData,
+  MergePdfData,
+  TimesheetSummarizeResponse,
+  GeneratePdfResponse,
+  MergePdfResponse,
+} from './types'
 
-export interface TimesheetData {
-  file: File
-}
-
-export interface TimesheetPdfData {
-  date: string
-}
-
-export interface TimesheetMergeData {
-  date: string
-  sendTo: string
-}
-
-export class TimesheetService {
-  private static readonly API_BASE_URL = process.env.NEXT_PUBLIC_N8N_URL
-
-  static async summarizeTimesheet(data: TimesheetData): Promise<ApiResponse> {
-    try {
-      // Simulate processing time for better UX demonstration
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      const formData = new FormData()
-      formData.append('file', data.file)
-
-      const response = await fetch(`${this.API_BASE_URL}/v2/talenta-timesheet/summarize`, {
-        method: 'POST',
-        body: formData,
-      })
-
-      const result = await response.json()
-
-      if (!response.ok) {
-        throw new Error(result.message || 'Failed to process timesheet')
-      }
-
-      return {
-        success: true,
-        message: result.message || 'Timesheet processed successfully',
-        data: result
-      }
-      
-    } catch (error) {
-      throw new Error(error instanceof Error ? error.message : 'Failed to process timesheet')
-    }
+export class TimesheetService extends BaseService {
+  static async summarizeTimesheet(
+    data: TimesheetData
+  ): Promise<ApiResponse<TimesheetSummarizeResponse>> {
+    const formData = this.createFormData({ file: data.file })
+    return this.fetch({
+      endpoint: '/v2/talenta-timesheet/summarize',
+      body: formData,
+      delay: this.getDelay('TIMESHEET_SUMMARIZE'),
+    })
   }
 
-  static async generatePdf(data: TimesheetPdfData): Promise<ApiResponse> {
-    try {
-      // Simulate processing time
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      const response = await fetch(`${this.API_BASE_URL}/talenta-timesheet/generate-pdf`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ date: data.date }),
-      })
-
-      const result = await response.json()
-
-      if (!response.ok) {
-        throw new Error(result.message || 'Failed to generate PDF')
-      }
-
-      return {
-        success: true,
-        message: result.message || 'PDF generated successfully',
-        data: result
-      }
-      
-    } catch (error) {
-      throw new Error(error instanceof Error ? error.message : 'Failed to generate PDF')
-    }
+  static async generatePdf(data: GeneratePdfData): Promise<ApiResponse<GeneratePdfResponse>> {
+    const formData = this.createFormData(data)
+    return this.fetch({
+      endpoint: '/talenta-timesheet/generate-pdf',
+      body: formData,
+      delay: this.getDelay('TIMESHEET_GENERATE_PDF'),
+    })
   }
 
-  static async mergePdfs(data: TimesheetMergeData): Promise<ApiResponse> {
-    try {
-      // Simulate processing time
-      await new Promise(resolve => setTimeout(resolve, 3000))
-      
-      const formData = new FormData()
-      formData.append('date', data.date)
-      formData.append('sendTo', data.sendTo)
-
-      const response = await fetch(`${this.API_BASE_URL}/talenta-timesheet/merge-pdf`, {
-        method: 'POST',
-        body: formData,
-      })
-
-      const result = await response.json()
-
-      if (!response.ok) {
-        throw new Error(result.message || 'Failed to merge PDFs')
-      }
-
-      return {
-        success: true,
-        message: result.message || 'PDFs merged successfully',
-        data: result
-      }
-      
-    } catch (error) {
-      throw new Error(error instanceof Error ? error.message : 'Failed to merge PDFs')
-    }
+  static async mergePdfs(data: MergePdfData): Promise<ApiResponse<MergePdfResponse>> {
+    const formData = this.createFormData(data)
+    return this.fetch({
+      endpoint: '/talenta-timesheet/merge-pdf',
+      body: formData,
+      delay: this.getDelay('TIMESHEET_MERGE_PDF'),
+    })
   }
 }
