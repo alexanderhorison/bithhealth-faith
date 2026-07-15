@@ -16,7 +16,7 @@ export interface UseFormSubmissionReturn {
   isResetting: boolean
   submitForm: (submitFn: () => Promise<unknown>) => Promise<void>
   resetForm: (resetFn?: () => void | Promise<void>) => Promise<void>
-  formRef?: React.RefObject<HTMLFormElement>
+  formRef?: React.RefObject<HTMLFormElement | null>
 }
 
 /**

@@ -18,7 +18,7 @@ export interface FileUploadState {
 export function useFileUpload(options: FileUploadOptions = {}) {
   const {
     maxSizeMB = FILE_CONFIG.MAX_SIZE_MB,
-    acceptedFormats = FILE_CONFIG.ACCEPTED_FORMATS,
+    acceptedFormats = FILE_CONFIG.ACCEPTED_FORMATS as readonly string[],
     multiple = false,
   } = options
 

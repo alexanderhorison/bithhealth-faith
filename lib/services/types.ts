@@ -50,7 +50,6 @@ export interface TimesheetSummarizeResponse {
 }
 
 export interface GeneratePdfData {
-  file: File
   date: string
 }
 
@@ -61,7 +60,6 @@ export interface GeneratePdfResponse {
 }
 
 export interface MergePdfData {
-  file: File
   date: string
   sendTo: string
 }

@@ -23,7 +23,7 @@ export class TimesheetService extends BaseService {
   }
 
   static async generatePdf(data: GeneratePdfData): Promise<ApiResponse<GeneratePdfResponse>> {
-    const formData = this.createFormData(data)
+    const formData = this.createFormData({ ...data })
     return this.fetch({
       endpoint: '/talenta-timesheet/generate-pdf',
       body: formData,
@@ -32,7 +32,7 @@ export class TimesheetService extends BaseService {
   }
 
   static async mergePdfs(data: MergePdfData): Promise<ApiResponse<MergePdfResponse>> {
-    const formData = this.createFormData(data)
+    const formData = this.createFormData({ ...data })
     return this.fetch({
       endpoint: '/talenta-timesheet/merge-pdf',
       body: formData,

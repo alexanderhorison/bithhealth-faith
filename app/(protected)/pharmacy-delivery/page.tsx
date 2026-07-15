@@ -89,7 +89,7 @@ export default function PharmacyDeliveryPage() {
 
       return await PharmacyDeliveryService.submitDeliveryData({
         data: file,
-        Month: month
+        month: month
       });
     });
   };
@@ -102,7 +102,7 @@ export default function PharmacyDeliveryPage() {
         throw new Error("Please select a month for summary report generation");
       }
 
-      return await PharmacyDeliveryService.generateSummaryReport(summaryMonth);
+      return await PharmacyDeliveryService.generateSummaryReport({ month: summaryMonth });
     });
   };
 
@@ -198,11 +198,12 @@ export default function PharmacyDeliveryPage() {
               </div>
 
               <div className="mt-auto">
-                <ProcessButton 
-                  isSubmitting={isSummarySubmitting} 
+                <ProcessButton
+                  isSubmitting={isSummarySubmitting}
                   isResetting={isSummaryResetting}
-                  text="Generate Summary Report"
-                />
+                >
+                  Generate Summary Report
+                </ProcessButton>
               </div>
             </form>
           </FormCard>
