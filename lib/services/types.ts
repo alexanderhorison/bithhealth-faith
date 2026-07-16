@@ -41,6 +41,7 @@ export interface FormSubmissionCallbacks {
  */
 export interface TimesheetData {
   file: File
+  file_name: string
 }
 
 export interface TimesheetSummarizeResponse {

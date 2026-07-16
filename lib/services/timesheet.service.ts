@@ -14,7 +14,7 @@ export class TimesheetService extends BaseService {
   static async summarizeTimesheet(
     data: TimesheetData
   ): Promise<ApiResponse<TimesheetSummarizeResponse>> {
-    const formData = this.createFormData({ file: data.file })
+    const formData = this.createFormData({ file: data.file, file_name: data.file_name })
     return this.fetch({
       endpoint: '/v2/talenta-timesheet/summarize',
       body: formData,

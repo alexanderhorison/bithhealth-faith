@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { FormCard } from '@/components/forms/form-card'
 import { ProcessButton } from '@/components/forms/process-button'
 import { WorkflowSteps } from '@/components/forms/workflow-steps'
@@ -30,10 +31,14 @@ const WORKFLOW_STEPS = [
 
 export default function TimesheetSummarizePage() {
   const { file, handleFileChange, clearFile } = useFileUpload()
+  const [fileName, setFileName] = useState('')
   const { isSubmitting, isResetting, submitForm, resetForm, formRef } =
     useFormSubmission({
       onSuccess: async () => {
-        await resetForm(() => clearFile('timesheet-file'))
+        await resetForm(() => {
+          clearFile('timesheet-file')
+          setFileName('')
+        })
       },
     })
 
@@ -45,7 +50,11 @@ export default function TimesheetSummarizePage() {
         throw new Error('Please select a timesheet file to continue')
       }
 
-      return await TimesheetService.summarizeTimesheet({ file })
+      if (!fileName) {
+        throw new Error('Please select a date for the file name')
+      }
+
+      return await TimesheetService.summarizeTimesheet({ file, file_name: fileName })
     })
   }
 
@@ -89,6 +98,18 @@ export default function TimesheetSummarizePage() {
                     Selected: {file.name}
                   </p>
                 )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="timesheet-file-name">
+                  File Date <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="timesheet-file-name"
+                  type="date"
+                  value={fileName}
+                  onChange={(e) => setFileName(e.target.value)}
+                />
               </div>
 
               <ProcessButton isSubmitting={isSubmitting} isResetting={isResetting}>
