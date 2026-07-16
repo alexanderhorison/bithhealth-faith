@@ -59,12 +59,12 @@ export function useFormSubmission<T = unknown>(
           description: 'Your request has been submitted successfully',
         })
 
+        // Show reset animation only on success
+        setIsResetting(true)
+
         if (onSuccess) {
           await onSuccess(result as T)
         }
-
-        // Show reset animation only on success
-        setIsResetting(true)
       } catch (error) {
         const errorMessage =
           error instanceof Error
